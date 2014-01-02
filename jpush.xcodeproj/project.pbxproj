@@ -8,7 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		5234D1FE18740B42000C37F1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5234D1FD18740B42000C37F1 /* main.cpp */; };
-		5234D20018740B42000C37F1 /* jpush.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5234D1FF18740B42000C37F1 /* jpush.1 */; };
+		5234D20818740B5B000C37F1 /* MIDIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5234D20618740B5B000C37F1 /* MIDIClient.cpp */; };
+		5234D20B18740BBD000C37F1 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5234D20918740BBD000C37F1 /* CoreFoundation.framework */; };
+		5234D20C18740BBD000C37F1 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5234D20A18740BBD000C37F1 /* CoreMIDI.framework */; };
+		5234D20F18741BCB000C37F1 /* PushClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5234D20D18741BCB000C37F1 /* PushClient.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -18,7 +21,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				5234D20018740B42000C37F1 /* jpush.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -27,7 +29,12 @@
 /* Begin PBXFileReference section */
 		5234D1FA18740B42000C37F1 /* jpush */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jpush; sourceTree = BUILT_PRODUCTS_DIR; };
 		5234D1FD18740B42000C37F1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		5234D1FF18740B42000C37F1 /* jpush.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = jpush.1; sourceTree = "<group>"; };
+		5234D20618740B5B000C37F1 /* MIDIClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIClient.cpp; sourceTree = "<group>"; };
+		5234D20718740B5B000C37F1 /* MIDIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIDIClient.h; sourceTree = "<group>"; };
+		5234D20918740BBD000C37F1 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		5234D20A18740BBD000C37F1 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
+		5234D20D18741BCB000C37F1 /* PushClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PushClient.cpp; sourceTree = "<group>"; };
+		5234D20E18741BCB000C37F1 /* PushClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushClient.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +42,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5234D20B18740BBD000C37F1 /* CoreFoundation.framework in Frameworks */,
+				5234D20C18740BBD000C37F1 /* CoreMIDI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +53,8 @@
 		5234D1F118740B42000C37F1 = {
 			isa = PBXGroup;
 			children = (
+				5234D20918740BBD000C37F1 /* CoreFoundation.framework */,
+				5234D20A18740BBD000C37F1 /* CoreMIDI.framework */,
 				5234D1FC18740B42000C37F1 /* jpush */,
 				5234D1FB18740B42000C37F1 /* Products */,
 			);
@@ -61,7 +72,10 @@
 			isa = PBXGroup;
 			children = (
 				5234D1FD18740B42000C37F1 /* main.cpp */,
-				5234D1FF18740B42000C37F1 /* jpush.1 */,
+				5234D20718740B5B000C37F1 /* MIDIClient.h */,
+				5234D20618740B5B000C37F1 /* MIDIClient.cpp */,
+				5234D20E18741BCB000C37F1 /* PushClient.h */,
+				5234D20D18741BCB000C37F1 /* PushClient.cpp */,
 			);
 			path = jpush;
 			sourceTree = "<group>";
@@ -117,7 +131,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5234D20F18741BCB000C37F1 /* PushClient.cpp in Sources */,
 				5234D1FE18740B42000C37F1 /* main.cpp in Sources */,
+				5234D20818740B5B000C37F1 /* MIDIClient.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,6 +241,7 @@
 				5234D20518740B42000C37F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
