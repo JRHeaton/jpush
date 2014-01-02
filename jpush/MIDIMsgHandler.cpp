@@ -32,24 +32,27 @@ void MIDIMsgHandler::handlePacketList(const MIDIPacketList *list) {
 }
 
 void MIDIMsgHandler::handlePacket(MIDIPacket *pkt) {
-    UInt8 *buf = (UInt8 *)pkt->data;
+    UInt8 *buff = (UInt8 *)pkt->data;
     
-    while(buf < (pkt->data + pkt->length)) {
+    UInt8 off = 0;
+    while(off < pkt->length) {
+        UInt8 *buf = &buff[off];
+        
         bool found = false;
         for(int i=0;i<sizeof(MsgTypes)/2;++i) {
             const struct MIDIMsgHandler::MsgType &t = MIDIMsgHandler::MsgTypes[i];
             
             if((buf[0] & 0xf0) == t.status) {
-                handleMsg(buf, t.length);
-                
-                buf += t.length;
+                UInt8 goodLen = !t.length ? pkt->length - off : t.length;
+                handleMsg(buf, goodLen);
+                off += goodLen;
                 found = true;
             }
         }
         if(found)
             found = false;
         else
-            buf++;
+            off++;
     }
 }
 
@@ -82,10 +85,8 @@ void MIDIMsgHandler::handleMsg(UInt8 *buf, size_t len) {
                 afterTouchHandler(buf[1], buf[2]);
             }
         } break;
-            
-        default: {
-            if(rawMsgHandler)
-                rawMsgHandler(buf, len);
-        }
     }
+    
+    if(rawMsgHandler)
+        rawMsgHandler(buf, len);
 }

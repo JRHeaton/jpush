@@ -114,9 +114,11 @@ PushClient::PushClient(CFStringRef name) : MIDIClient(name) {
         CFRelease(n);
     }
     
+    // setting true just makes it so it still calls the original handlers
     customHandlerStatusBytes[0x90] = true;
     customHandlerStatusBytes[0x80] = true;
     customHandlerStatusBytes[0xb0] = true;
+    customHandlerStatusBytes[0xf0] = true;
     
     livePortDest = getDestination(CFSTR("Live Port"));
     destEndpoint = userPortDest;
@@ -326,8 +328,13 @@ void PushClient::handleMsg(UInt8 *buf, size_t len) {
                 }
             }
             
-            logData("controller ", buf, len);
             buttonHandler(name, buf[1], buf[2] != 0);
+        }
+    } else if((buf[0] & 0xf0) == 0xf0) {
+        off_t offset = sizeof(PushClient::kPushSysexPrefix);
+        if(!memcmp(&buf[offset], kPushSysexSetModeCmd, sizeof(kPushSysexSetModeCmd))) {
+            if(modeChangeHandler)
+                modeChangeHandler(buf[offset + sizeof(kPushSysexSetModeCmd)] == 1);
         }
     }
 }
