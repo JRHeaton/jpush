@@ -146,8 +146,6 @@ void PushClient::gridPositionForKey(UInt8 key, UInt8 *column, UInt8 *row) {
         *row = r;
     if(column)
         *column = 8 - (((8 - r) * 8) - key);
-    
-    std::cout << (int)key << std::endl;
 }
 
 PushClient * PushClient::clearAll() {
@@ -277,7 +275,6 @@ std::string PushClient::logString() {
 }
 
 PushClient *PushClient::clearButtons() {
-    std::cout << "size: " << PushClient::ButtonTitleCCMap->size() <<std::endl;
     for(auto it = PushClient::ButtonTitleCCMap->begin(); it != PushClient::ButtonTitleCCMap->end(); ++it) {
         UInt8 key = it->second;
         buttonOff(key);
