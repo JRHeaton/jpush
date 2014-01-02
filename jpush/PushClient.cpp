@@ -116,6 +116,7 @@ PushClient::PushClient(CFStringRef name) : MIDIClient(name) {
     
     customHandlerStatusBytes[0x90] = true;
     customHandlerStatusBytes[0x80] = true;
+    customHandlerStatusBytes[0xb0] = true;
     
     livePortDest = getDestination(CFSTR("Live Port"));
     destEndpoint = userPortDest;
@@ -188,11 +189,16 @@ PushClient *PushClient::sendSysex(UInt8 *buf,
     return this;
 }
 
-PushClient *PushClient::gridPadOn(UInt8 xColumn, UInt8 yRow, UInt8 velocity) {
-    UInt8 key = PushClient::keyForGridPosition(xColumn, yRow);
+PushClient *PushClient::gridPadOnV(UInt8 key, UInt8 velocity) {
     UInt8 buf[3] = { 0x90, key, velocity };
     
     return sendMIDI(buf, 3);
+}
+
+PushClient *PushClient::gridPadOn(UInt8 xColumn, UInt8 yRow, UInt8 velocity) {
+    UInt8 key = PushClient::keyForGridPosition(xColumn, yRow);
+    
+    return gridPadOnV(key, velocity);
 }
 
 PushClient *PushClient::allGridPads(UInt8 velocity) {
@@ -218,7 +224,7 @@ PushClient *PushClient::buttonOn(std::string title, UInt8 velocity) {
     CFStringAppendCString(str, title.c_str(), kCFStringEncodingUTF8);
     CFStringLowercase(str, CFLocaleGetSystem());
     
-    PushClient  *c= buttonOn(PushClient::ButtonTitleCCMap->at(CFStringGetCStringPtr(str, kCFStringEncodingUTF8)));
+    PushClient * c = buttonOn(PushClient::ButtonTitleCCMap->at(CFStringGetCStringPtr(str, kCFStringEncodingUTF8)), velocity);
     CFRelease(str);
     
     return c;
@@ -309,6 +315,19 @@ void PushClient::handleMsg(UInt8 *buf, size_t len) {
             UInt8 c, r;
             PushClient::gridPositionForKey(buf[1], &c, &r);
             gridPadHandler(c, r, buf[2], false);
+        }
+    } else if((buf[0] & 0xf0) == 0xb0) {
+        if(buttonHandler) {
+            std::string name;
+            for(auto it = ButtonTitleCCMap->begin(); it != ButtonTitleCCMap->end(); ++it) {
+                if(it->second == buf[1]) {
+                    name = it->first;
+                    break;
+                }
+            }
+            
+            logData("controller ", buf, len);
+            buttonHandler(name, buf[1], buf[2] != 0);
         }
     }
 }

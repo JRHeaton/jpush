@@ -17,6 +17,8 @@
 
 // i/o and similar methods will return 'this' on success, nullptr on failure
 
+#define VELOCITY_MAX 127
+
 class MIDIClient : public MIDIMsgHandler {
 protected:
     MIDIClientRef   client;
@@ -51,7 +53,7 @@ public:
                                    size_t len,
                                    MIDICompletionProc completionProc=nullptr,
                                    bool applyTerminatingByte=true);
-    
+        
     virtual void        logObject(MIDIObjectRef obj);
     void                logSelf();
     virtual std::string logString();
