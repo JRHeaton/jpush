@@ -9,8 +9,17 @@
 #include "PushClient.h"
 #include <sstream>
 
-#define MAX (a, b) ((a) < (b) ? (b) : (a))
-#define MIN (a, b) ((a) < (b) ? (a) : (b))
+// | start --|  |allsens| |off_thres|  |on_thres-|  |gain-----------------|  |curve1---------------|  |curve2---------------|  EOX
+//
+// change pad threshold
+// F0 47 7F 15  5D 00 20  00 00 07 06  00 00 08 02  00 00 00 01 08 06 0A 00  00 00 00 01 0D 04 0C 00  00 00 00 00 0C 03 05 00  F7
+// F0 47 7F 15  5D 00 20  00 00 06 0D  00 00 07 08  00 00 00 01 08 06 0A 00  00 00 00 01 0D 04 0C 00  00 00 00 00 0C 03 05 00  F7
+// F0 47 7F 15  5D 00 20  00 00 06 04  00 00 06 0E  00 00 00 01 08 06 0A 00  00 00 00 01 0D 04 0C 00  00 00 00 00 0C 03 05 00  F7
+//
+// change vel curve
+// F0 47 7F 15  5D 00 20  00 00 06 04  00 00 06 0E  00 00 00 01 04 0C 00 08  00 00 00 01 0D 04 0C 00  00 00 00 00 0C 03 05 00  F7
+// F0 47 7F 15  5D 00 20  00 00 06 04  00 00 06 0E  00 00 00 01 08 06 0A 00  00 00 00 01 0D 04 0C 00  00 00 00 00 0C 03 05 00  F7
+// F0 47 7F 15  5D 00 20  00 00 06 04  00 00 06 0E  00 00 00 01 04 0C 00 08  00 00 00 01 0D 04 0C 00  00 00 00 00 0C 03 05 00  F7
 
 #define _c(func, exp) { if(debuggingEnabled) { printf("%s: 0x%0lx\n", #func, (unsigned long)exp); } }
 #define _v if(debuggingEnabled)
@@ -29,6 +38,7 @@ const UInt8 PushClient::kPushSysexLCDLineWriteCmds[4][4] = {
     { 26, 0, 69, 0 },
     { 27, 0, 69, 0 }
 };
+const UInt8 PushClient::kPushSysexSetModeCmd[3] = { 98, 0, 1 };
 std::map<std::string, UInt8> *PushClient::ButtonTitleCCMap = nullptr;
 
 PushClient::PushClient(CFStringRef name) : MIDIClient(name) {
@@ -127,6 +137,8 @@ void PushClient::handleMIDIIn(const MIDIPacketList *packetList) {
             UInt8 x, y;
             PushClient::gridPositionForKey(packet->data[1], &x, &y);
             gridPadHandler(x, y, packet->data[2] != 0);
+        } else if(status == 0xf0 && sysexHandler) {
+            sysexHandler((UInt8 *)packet->data, packet->length);
         }
         
         packet = MIDIPacketNext(packet);
@@ -146,6 +158,18 @@ void PushClient::gridPositionForKey(UInt8 key, UInt8 *column, UInt8 *row) {
         *row = r;
     if(column)
         *column = 8 - (((8 - r) * 8) - key);
+}
+
+PushClient *PushClient::setUserMode(bool userMode, bool autoHighlightUserButton) {
+    UInt8 b[4];
+    memcpy(b, PushClient::kPushSysexSetModeCmd, sizeof(PushClient::kPushSysexSetModeCmd));
+    b[3] = userMode == true;
+    sendSysex(b, 4);
+    
+    if(autoHighlightUserButton)
+        buttonOn("user");
+    
+    return this;
 }
 
 PushClient * PushClient::clearAll() {
@@ -274,11 +298,17 @@ std::string PushClient::logString() {
     return str.str();
 }
 
-PushClient *PushClient::clearButtons() {
+PushClient *PushClient::allButtons(UInt8 velocity) {
     for(auto it = PushClient::ButtonTitleCCMap->begin(); it != PushClient::ButtonTitleCCMap->end(); ++it) {
         UInt8 key = it->second;
-        buttonOff(key);
+        buttonOn(key, velocity);
     }
+    
+    return this;
+}
+
+PushClient *PushClient::clearButtons() {
+    allButtons(0);
     
     return this;
 }

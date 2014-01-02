@@ -16,9 +16,6 @@
 // i/o and similar methods will return 'this' on success, nullptr on failure
 
 class MIDIClient {
-private:
-    void _logBuf(const char *n, UInt8 *b, size_t len);
-
 protected:
     MIDIClientRef   client;
     MIDIPortRef     inPort, outPort;
@@ -58,6 +55,7 @@ public:
     virtual std::string logString();
     
     bool                debuggingEnabled = false, logSysex = false;
+    void                logData(const char *n, UInt8 *b, size_t len); // convenience
 };
 
 #endif /* MIDICLIENT_H */

@@ -23,6 +23,7 @@ protected:
 public:
     static const UInt8 kLCDColumnWidth;
     static const UInt8 kPushSysexPrefix[4];
+    static const UInt8 kPushSysexSetModeCmd[3];
     static const UInt8 kPushSysexLCDLineClearCmds[4][3];
     static const UInt8 kPushSysexLCDLineWriteCmds[4][4];
     
@@ -33,6 +34,7 @@ public:
     
     void            (^rawInputHandler)(UInt8 *buf, size_t len) = 0;
     void            (^gridPadHandler)(UInt8 xColumn, UInt8 yRow, bool on) = 0;
+    void            (^sysexHandler)(UInt8 *buf, size_t len) = 0;
     
     static UInt8    keyForGridPosition(UInt8 column, UInt8 row);
     static void     gridPositionForKey(UInt8 key, UInt8 *column, UInt8 *row);
@@ -44,6 +46,7 @@ public:
                            bool applyTerminatingByte=true,
                            bool prependWithPushStartSysex=true);
     
+    PushClient  *setUserMode(bool userMode=true, bool autoHighlightUserButton=false);
     PushClient  *clearAll();
     
     PushClient  *clearGrid();
@@ -53,6 +56,7 @@ public:
     PushClient  *buttonOn(std::string title, UInt8 velocity=VELOCITY_MAX);
     PushClient  *buttonOn(UInt8 buttonCC, UInt8 velocity=VELOCITY_MAX);
     PushClient  *buttonOff(UInt8 buttonCC) { return buttonOn(buttonCC, 0); };
+    PushClient  *allButtons(UInt8 velocity=VELOCITY_MAX);
     PushClient  *clearButtons();
     
     PushClient  *clearLCD(SInt8 line=-1);

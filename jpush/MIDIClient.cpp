@@ -16,8 +16,8 @@ struct __sysexCompletion {
     UInt8 *odata; // original ptr not moved by sysex sender
 };
 
-void MIDIClient::_logBuf(const char *n, UInt8 *b, size_t len) {
-    printf("%s payload (len=%zu): { \n", n, len);
+void MIDIClient::logData(const char *n, UInt8 *b, size_t len) {
+    printf("%s (len=%zu): { \n", n, len);
     for(int i=0;i<len;++i) {
         printf("0x%02x", b[i]);
         if(i+1 < len)
@@ -54,7 +54,7 @@ void MIDIClient::MIDIReadProc(const MIDIPacketList *pktlist, void *readProcRefCo
 
 void MIDIClient::handleMIDIIn(const MIDIPacketList *list) {
     if(debuggingEnabled)
-        _logBuf("midiIn", (UInt8 *)list->packet[0].data, list->packet[0].length);
+        logData("midiIn", (UInt8 *)list->packet[0].data, list->packet[0].length);
 }
 
 MIDIClient::MIDIClient(CFStringRef name, bool verbose) {
@@ -150,7 +150,7 @@ MIDIClient *MIDIClient::sendMIDI(MIDIEndpointRef dest, UInt8 *buf, size_t len) {
     memcpy(l.packet[0].data, buf, len > 256 ? 256 : len);
     
     if(debuggingEnabled) {
-        _logBuf("MIDISend", buf, len);
+        logData("MIDISend", buf, len);
     }
     
     _c(MIDISend, MIDISend(outPort, dest, &l));
@@ -179,7 +179,7 @@ MIDIClient *MIDIClient::sendSysex(MIDIEndpointRef dest,
     r->data = ptr;
     
     if(logSysex) {
-        _logBuf("MIDISysexSend", (UInt8*)r->data, r->bytesToSend);
+        logData("MIDISysexSend", (UInt8*)r->data, r->bytesToSend);
     }
     
     r->completionProc = &MIDIClient::MIDISysexCompletion;
