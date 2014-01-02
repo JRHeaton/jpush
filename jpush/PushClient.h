@@ -32,6 +32,10 @@ public:
     static const UInt8 kPushSysexLCDLineClearCmds[4][3];
     static const UInt8 kPushSysexLCDLineWriteCmds[4][4];
     
+//    static bool AbletonOpen() {
+//        
+//    };
+    
     static std::map<std::string, UInt8> *ButtonTitleCCMap;
     
     void            (^modeChangeHandler)(bool userMode)                     = 0;

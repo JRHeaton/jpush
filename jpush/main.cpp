@@ -11,7 +11,7 @@
 #include <sys/random.h>
 
 int main(int argc, const char * argv[]) {
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
     
     int pads = 35;
     __block int highlight = 36;
@@ -26,32 +26,25 @@ int main(int argc, const char * argv[]) {
             c->allGridPads(pads);
             c->writeLCD("jpush", 1);
             c->writeLCD("Ableton Push i/o hax for funsies", 2);
-            c->buttonOn("out");
+            c->buttonOn("out")->buttonOn("user");
         }
     };
     c->setUserMode();
     c->modeChangeHandler(true);
-    
-    c->buttonHandler = ^(std::string name,
-                         UInt8 CID,
-                         bool on) {
+    c->buttonHandler = ^(std::string name, UInt8 CID, bool on) {
         printf("button: name=%s, CID=%02x, on=%d\n", name.c_str(), CID, on);
-//        c->buttonOn(CID, !on?0:127);
-        
+    
         if(on && name == "out") {
-            highlight = (rand() % 110) + 10;
-            off = (rand() % 110) + 10;
+            highlight = (rand() % 126) + 1;
+            off = ((rand() % 126) + 1);
             
-            c->allGridPads((rand() % 110) + 10);
+            c->allGridPads((rand() % 126) + 1);
         }
     };
-    c->noteHandler = ^(bool noteOn,
-                       UInt8 key,
-                       UInt8 velocity) {
+    c->noteHandler = ^(bool noteOn, UInt8 key, UInt8 velocity) {
         printf("on=%d, key=%02x, velocity=%d\n", noteOn, key, velocity);
     };
-    c->afterTouchHandler = ^(UInt8 key,
-                             UInt8 pressure) {
+    c->afterTouchHandler = ^(UInt8 key, UInt8 pressure) {
         printf("aftertouch key=%02x, pressure=%d\n", key, pressure);
     };
     c->gridPadHandler = ^(UInt8 xColumn, UInt8 yRow, UInt8 vel, bool on) {
