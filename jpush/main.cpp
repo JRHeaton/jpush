@@ -8,8 +8,14 @@
 
 #include <iostream>
 #include "PushClient.h"
+#include <sys/random.h>
 
 int main(int argc, const char * argv[]) {
+    srand(time(NULL));
+    
+    int pads = 35;
+    __block int highlight = 36;
+    __block int off = 50;
     
     PushClient *c = new PushClient(CFSTR("pushstuff"));
     c->modeChangeHandler = ^(bool user) {
@@ -17,10 +23,10 @@ int main(int argc, const char * argv[]) {
         
         if(user) {
             c->clearAll();
-            c->allGridPads(35);
+            c->allGridPads(pads);
             c->writeLCD("jpush", 1);
             c->writeLCD("Ableton Push i/o hax for funsies", 2);
-            c->allButtons();
+            c->buttonOn("out");
         }
     };
     c->setUserMode();
@@ -30,7 +36,14 @@ int main(int argc, const char * argv[]) {
                          UInt8 CID,
                          bool on) {
         printf("button: name=%s, CID=%02x, on=%d\n", name.c_str(), CID, on);
-        c->buttonOn(CID, !on?0:127);
+//        c->buttonOn(CID, !on?0:127);
+        
+        if(on && name == "out") {
+            highlight = (rand() % 110) + 10;
+            off = (rand() % 110) + 10;
+            
+            c->allGridPads((rand() % 110) + 10);
+        }
     };
     c->noteHandler = ^(bool noteOn,
                        UInt8 key,
@@ -43,7 +56,7 @@ int main(int argc, const char * argv[]) {
     };
     c->gridPadHandler = ^(UInt8 xColumn, UInt8 yRow, UInt8 vel, bool on) {
         printf("grid pad (%d, %d): on=%d, velocity=%d\n", xColumn, yRow, on, vel);
-        c->gridPadOn(xColumn, yRow, on ? 36 : 50);
+        c->gridPadOn(xColumn, yRow, on ? highlight : off);
     };
     
     CFRunLoopRun();

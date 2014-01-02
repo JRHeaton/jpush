@@ -53,7 +53,7 @@ public:
                            bool applyTerminatingByte=true,
                            bool prependWithPushStartSysex=true);
     
-    PushClient  *setUserMode(bool userMode=true, bool autoHighlightUserButton=false);
+    PushClient  *setUserMode(bool userMode=true, bool autoHighlightUserButton=true);
     PushClient  *clearAll();
     
     PushClient  *allGridPads(UInt8 velocity=VELOCITY_MAX);
