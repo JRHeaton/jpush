@@ -44,11 +44,11 @@ public:
     void                connectSource(MIDIEndpointRef source);
     virtual CFStringRef getName(MIDIObjectRef obj);
     
-    MIDIClient          *wait(double seconds);
+    MIDIClient          &wait(double seconds);
     void                after(double seconds, void (^block)());
     
-    virtual MIDIClient  *sendMIDI(MIDIEndpointRef dest, UInt8 *buf, size_t len);
-    virtual MIDIClient  *sendSysex(MIDIEndpointRef dest,
+    virtual MIDIClient  &sendMIDI(MIDIEndpointRef dest, UInt8 *buf, size_t len);
+    virtual MIDIClient  &sendSysex(MIDIEndpointRef dest,
                                    UInt8 *buf,
                                    size_t len,
                                    MIDICompletionProc completionProc=nullptr,

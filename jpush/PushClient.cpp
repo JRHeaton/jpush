@@ -145,7 +145,7 @@ void PushClient::gridPositionForKey(UInt8 key, UInt8 *column, UInt8 *row) {
         *column = 8 - (((8 - r) * 8) - key);
 }
 
-PushClient *PushClient::setUserMode(bool userMode, bool autoHighlightUserButton) {
+PushClient &PushClient::setUserMode(bool userMode, bool autoHighlightUserButton) {
     UInt8 b[4];
     memcpy(b, PushClient::kPushSysexSetModeCmd, sizeof(PushClient::kPushSysexSetModeCmd));
     b[3] = userMode == true;
@@ -154,24 +154,24 @@ PushClient *PushClient::setUserMode(bool userMode, bool autoHighlightUserButton)
     if(userMode && autoHighlightUserButton)
         buttonOn("user");
     
-    return this;
+    return *this;
 }
 
-PushClient * PushClient::clearAll() {
+PushClient &PushClient::clearAll() {
     clearLCD();
     clearButtons();
     clearGrid();
     
-    return this;
+    return *this;
 }
 
-PushClient *PushClient::sendMIDI(UInt8 *buf, size_t len) {
+PushClient &PushClient::sendMIDI(UInt8 *buf, size_t len) {
     MIDIClient::sendMIDI(userPortDest, buf, len);
     
-    return this;
+    return *this;
 }
 
-PushClient *PushClient::sendSysex(UInt8 *buf,
+PushClient &PushClient::sendSysex(UInt8 *buf,
                                   size_t len,
                                   MIDICompletionProc completionProc,
                                   bool applyTerminatingByte,
@@ -188,22 +188,22 @@ PushClient *PushClient::sendSysex(UInt8 *buf,
     MIDIClient::sendSysex(destEndpoint, gbuf, llen, completionProc, applyTerminatingByte);
     free(gbuf);
     
-    return this;
+    return *this;
 }
 
-PushClient *PushClient::gridPadOnV(UInt8 key, UInt8 velocity) {
+PushClient &PushClient::gridPadOnV(UInt8 key, UInt8 velocity) {
     UInt8 buf[3] = { 0x90, key, velocity };
     
     return sendMIDI(buf, 3);
 }
 
-PushClient *PushClient::gridPadOn(UInt8 xColumn, UInt8 yRow, UInt8 velocity) {
+PushClient &PushClient::gridPadOn(UInt8 xColumn, UInt8 yRow, UInt8 velocity) {
     UInt8 key = PushClient::keyForGridPosition(xColumn, yRow);
     
     return gridPadOnV(key, velocity);
 }
 
-PushClient *PushClient::allGridPads(UInt8 velocity) {
+PushClient &PushClient::allGridPads(UInt8 velocity) {
     bool pre = debuggingEnabled;
     debuggingEnabled = false;
     for (int i=0;i<8;++i) {
@@ -213,48 +213,46 @@ PushClient *PushClient::allGridPads(UInt8 velocity) {
     }
     debuggingEnabled = pre;
     
-    return this;
+    return *this;
 }
 
-PushClient *PushClient::buttonOn(std::string title, UInt8 velocity) {
+PushClient &PushClient::buttonOn(std::string title, UInt8 velocity) {
     if(!title.length()) {
         _v std::cout << "invalid button title\n";
-        return this;
+        return *this;
     }
     
     CFMutableStringRef str = CFStringCreateMutable(NULL, title.length());
     CFStringAppendCString(str, title.c_str(), kCFStringEncodingUTF8);
     CFStringLowercase(str, CFLocaleGetSystem());
     
-    PushClient * c = buttonOn(PushClient::ButtonTitleCCMap->at(CFStringGetCStringPtr(str, kCFStringEncodingUTF8)), velocity);
+    PushClient& c = buttonOn(PushClient::ButtonTitleCCMap->at(CFStringGetCStringPtr(str, kCFStringEncodingUTF8)), velocity);
     CFRelease(str);
     
     return c;
 }
 
-PushClient *PushClient::buttonOn(UInt8 buttonCC, UInt8 velocity) {
+PushClient &PushClient::buttonOn(UInt8 buttonCC, UInt8 velocity) {
     UInt8 b[3] = { 0xb0, buttonCC, velocity };
     return sendMIDI(b, 3);
 }
 
-PushClient *PushClient::clearLCD(SInt8 line) {
+PushClient &PushClient::clearLCD(SInt8 line) {
     if(line >= 0) {
         if(line >= 4)
-            return nullptr;
+            return *this;
         
         return sendSysex((UInt8 *)PushClient::kPushSysexLCDLineClearCmds[line], 3);
     }
 
     for(int i=0;i<4;++i) {
-        if(!sendSysex((UInt8 *)PushClient::kPushSysexLCDLineClearCmds[i], 3)) {
-            return nullptr;
-        }
+        sendSysex((UInt8 *)PushClient::kPushSysexLCDLineClearCmds[i], 3);
     }
     
-    return this;
+    return *this;
 }
 
-PushClient *PushClient::writeLCD(std::string text, SInt8 line, UInt8 charInset) {
+PushClient &PushClient::writeLCD(std::string text, SInt8 line, UInt8 charInset) {
     if(line < 0)
         line = 0;
     else if (line > 3)
@@ -268,7 +266,7 @@ PushClient *PushClient::writeLCD(std::string text, SInt8 line, UInt8 charInset) 
     
     int space = 68 - charInset;
     if(space <= 0)
-        return this;
+        return *this;
     
     UInt8 *buf = new UInt8 [SIZE];
     memset(buf, 0x20, SIZE);
@@ -278,7 +276,7 @@ PushClient *PushClient::writeLCD(std::string text, SInt8 line, UInt8 charInset) 
     sendSysex(buf, SIZE);
     delete [] buf;
     
-    return this;
+    return *this;
 }
 
 std::string PushClient::logString() {
@@ -288,19 +286,19 @@ std::string PushClient::logString() {
     return str.str();
 }
 
-PushClient *PushClient::allButtons(UInt8 velocity) {
+PushClient &PushClient::allButtons(UInt8 velocity) {
     for(auto it = PushClient::ButtonTitleCCMap->begin(); it != PushClient::ButtonTitleCCMap->end(); ++it) {
         UInt8 key = it->second;
         buttonOn(key, velocity);
     }
     
-    return this;
+    return *this;
 }
 
-PushClient *PushClient::clearButtons() {
+PushClient &PushClient::clearButtons() {
     allButtons(0);
     
-    return this;
+    return *this;
 }
 
 void PushClient::handleMsg(UInt8 *buf, size_t len) {

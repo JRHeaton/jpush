@@ -132,10 +132,10 @@ CFStringRef MIDIClient::getName(MIDIObjectRef obj) {
     return name;
 }
 
-MIDIClient * MIDIClient::wait(double seconds) {
+MIDIClient & MIDIClient::wait(double seconds) {
     usleep(1000000 * seconds);
     
-    return this;
+    return *this;
 }
 
 void MIDIClient::after(double seconds, void (^block)()) {
@@ -144,7 +144,7 @@ void MIDIClient::after(double seconds, void (^block)()) {
     dispatch_after(popTime, dispatch_get_main_queue(), block);
 }
 
-MIDIClient *MIDIClient::sendMIDI(MIDIEndpointRef dest, UInt8 *buf, size_t len) {
+MIDIClient &MIDIClient::sendMIDI(MIDIEndpointRef dest, UInt8 *buf, size_t len) {
     MIDIPacketList l;
     l.numPackets = 1;
     l.packet[0].timeStamp = 0;
@@ -157,10 +157,10 @@ MIDIClient *MIDIClient::sendMIDI(MIDIEndpointRef dest, UInt8 *buf, size_t len) {
     
     _c(MIDISend, MIDISend(outPort, dest, &l));
     
-    return this;
+    return *this;
 }
 
-MIDIClient *MIDIClient::sendSysex(MIDIEndpointRef dest,
+MIDIClient &MIDIClient::sendSysex(MIDIEndpointRef dest,
                            UInt8 *buf,
                            size_t len,
                            MIDICompletionProc completionProc,
@@ -196,7 +196,7 @@ MIDIClient *MIDIClient::sendSysex(MIDIEndpointRef dest,
     
     _c(MIDISendSysex, MIDISendSysex(r));
     
-    return this;;
+    return *this;
 }
 
 void MIDIClient::logObject(MIDIObjectRef obj){

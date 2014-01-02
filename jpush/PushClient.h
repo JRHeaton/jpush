@@ -50,31 +50,31 @@ public:
     static UInt8    keyForGridPosition(UInt8 column, UInt8 row);
     static void     gridPositionForKey(UInt8 key, UInt8 *column, UInt8 *row);
     
-    PushClient  *sendMIDI(UInt8 *buf, size_t len);
-    PushClient  *sendSysex(UInt8 *buf,
+    PushClient  &sendMIDI(UInt8 *buf, size_t len);
+    PushClient  &sendSysex(UInt8 *buf,
                            size_t len,
                            MIDICompletionProc completionProc=nullptr,
                            bool applyTerminatingByte=true,
                            bool prependWithPushStartSysex=true);
     
-    PushClient  *setUserMode(bool userMode=true, bool autoHighlightUserButton=true);
-    PushClient  *clearAll();
+    PushClient  &setUserMode(bool userMode=true, bool autoHighlightUserButton=true);
+    PushClient  &clearAll();
     
-    PushClient  *allGridPads(UInt8 velocity=VELOCITY_MAX);
-    PushClient  *clearGrid() { return allGridPads(0); };
-    PushClient  *gridPadOnV(UInt8 key, UInt8 velocity=VELOCITY_MAX);
-    PushClient  *gridPadOn(UInt8 xColumn, UInt8 yRow, UInt8 velocity=VELOCITY_MAX);
-    PushClient  *gridPadOff(UInt8 xColumn, UInt8 yRow) { return gridPadOn(xColumn, yRow, 0); };
+    PushClient  &allGridPads(UInt8 velocity=VELOCITY_MAX);
+    PushClient  &clearGrid() { return allGridPads(0); };
+    PushClient  &gridPadOnV(UInt8 key, UInt8 velocity=VELOCITY_MAX);
+    PushClient  &gridPadOn(UInt8 xColumn, UInt8 yRow, UInt8 velocity=VELOCITY_MAX);
+    PushClient  &gridPadOff(UInt8 xColumn, UInt8 yRow) { return gridPadOn(xColumn, yRow, 0); };
     
-    PushClient  *buttonOn(std::string title, UInt8 velocity=VELOCITY_MAX);
-    PushClient  *buttonOn(UInt8 buttonCC, UInt8 velocity=VELOCITY_MAX);
-    PushClient  *buttonOff(UInt8 buttonCC) { return buttonOn(buttonCC, 0); };
-    PushClient  *buttonOff(std::string title) { return buttonOn(title, 0); };
-    PushClient  *allButtons(UInt8 velocity=VELOCITY_MAX);
-    PushClient  *clearButtons();
+    PushClient  &buttonOn(std::string title, UInt8 velocity=VELOCITY_MAX);
+    PushClient  &buttonOn(UInt8 buttonCC, UInt8 velocity=VELOCITY_MAX);
+    PushClient  &buttonOff(UInt8 buttonCC) { return buttonOn(buttonCC, 0); };
+    PushClient  &buttonOff(std::string title) { return buttonOn(title, 0); };
+    PushClient  &allButtons(UInt8 velocity=VELOCITY_MAX);
+    PushClient  &clearButtons();
     
-    PushClient  *clearLCD(SInt8 line=-1);
-    PushClient  *writeLCD(std::string text, SInt8 line=0, UInt8 charInset=0);
+    PushClient  &clearLCD(SInt8 line=-1);
+    PushClient  &writeLCD(std::string text, SInt8 line=0, UInt8 charInset=0);
     
     virtual     std::string logString();
 };
