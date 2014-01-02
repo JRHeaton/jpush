@@ -12,6 +12,7 @@
 		5234D20B18740BBD000C37F1 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5234D20918740BBD000C37F1 /* CoreFoundation.framework */; };
 		5234D20C18740BBD000C37F1 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5234D20A18740BBD000C37F1 /* CoreMIDI.framework */; };
 		5234D20F18741BCB000C37F1 /* PushClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5234D20D18741BCB000C37F1 /* PushClient.cpp */; };
+		52CE5013187515C100ADF895 /* MIDIMsgHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 52CE5011187515C100ADF895 /* MIDIMsgHandler.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -35,6 +36,8 @@
 		5234D20A18740BBD000C37F1 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
 		5234D20D18741BCB000C37F1 /* PushClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PushClient.cpp; sourceTree = "<group>"; };
 		5234D20E18741BCB000C37F1 /* PushClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushClient.h; sourceTree = "<group>"; };
+		52CE5011187515C100ADF895 /* MIDIMsgHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MIDIMsgHandler.cpp; sourceTree = "<group>"; };
+		52CE5012187515C100ADF895 /* MIDIMsgHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIDIMsgHandler.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +75,8 @@
 			isa = PBXGroup;
 			children = (
 				5234D1FD18740B42000C37F1 /* main.cpp */,
+				52CE5012187515C100ADF895 /* MIDIMsgHandler.h */,
+				52CE5011187515C100ADF895 /* MIDIMsgHandler.cpp */,
 				5234D20718740B5B000C37F1 /* MIDIClient.h */,
 				5234D20618740B5B000C37F1 /* MIDIClient.cpp */,
 				5234D20E18741BCB000C37F1 /* PushClient.h */,
@@ -134,6 +139,7 @@
 				5234D20F18741BCB000C37F1 /* PushClient.cpp in Sources */,
 				5234D1FE18740B42000C37F1 /* main.cpp in Sources */,
 				5234D20818740B5B000C37F1 /* MIDIClient.cpp in Sources */,
+				52CE5013187515C100ADF895 /* MIDIMsgHandler.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

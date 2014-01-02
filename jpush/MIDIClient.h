@@ -13,9 +13,11 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreMIDI/CoreMIDI.h>
 
+#include "MIDIMsgHandler.h"
+
 // i/o and similar methods will return 'this' on success, nullptr on failure
 
-class MIDIClient {
+class MIDIClient : public MIDIMsgHandler {
 protected:
     MIDIClientRef   client;
     MIDIPortRef     inPort, outPort;
@@ -24,18 +26,18 @@ protected:
     static void     MIDINotifyProc(const MIDINotification *message, void *refCon);
     static void     MIDIReadProc(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
     
-    virtual void    handleMIDIIn(const MIDIPacketList *list);
+    virtual void    handleMsg(UInt8 *buf, size_t len);
     
 public:
     MIDIClient(CFStringRef name=CFSTR("MIDIClient"), bool verbose=false);
     virtual ~MIDIClient();
     
-    ItemCount   numDests();
-    ItemCount   numSources();
+    ItemCount           numDests();
+    ItemCount           numSources();
     
-    MIDIEndpointRef getSource(CFStringRef name);
-    MIDIEndpointRef getDestination(CFStringRef name);
-    MIDIEndpointRef destAtIndex(CFIndex index);
+    MIDIEndpointRef     getSource(CFStringRef name);
+    MIDIEndpointRef     getDestination(CFStringRef name);
+    MIDIEndpointRef     destAtIndex(CFIndex index);
     
     void                connectSource(MIDIEndpointRef source);
     virtual CFStringRef getName(MIDIObjectRef obj);

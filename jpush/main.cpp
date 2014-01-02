@@ -10,13 +10,33 @@
 #include "PushClient.h"
 
 int main(int argc, const char * argv[]) {
-    PushClient *c = new PushClient(CFSTR("pushstuff"));
-    c->sysexHandler = ^(UInt8 *buf, size_t len) {
-        c->logData("sysex input", buf, len);
-    };
     
-    c->setUserMode(true, true);
+    PushClient *c = new PushClient(CFSTR("pushstuff"));
+    c->clearAll();
+    c->allGridPads(50);
     c->allButtons();
+    c->writeLCD("jpush", 1);
+    c->writeLCD("Ableton Push i/o hax for funsies", 2);
+    
+    c->noteHandler = ^(bool noteOn,
+                       UInt8 key,
+                       UInt8 velocity) {
+        printf("on=%d, key=%02x, velocity=%d\n", noteOn, key, velocity);
+    };
+    c->controlChangeHandler = ^(UInt8 CID,
+                                UInt8 val) {
+        printf("cid=%02x, val=%d\n", CID, val);
+        
+        c->buttonOn(CID, val == 0 ? 0 : 127);
+    };
+    c->afterTouchHandler = ^(UInt8 key,
+                             UInt8 pressure) {
+//        printf("aftertouch key=%02x, pressure=%d\n", key, pressure);
+    };
+    c->gridPadHandler = ^(UInt8 xColumn, UInt8 yRow, UInt8 vel, bool on) {
+        printf("(%d, %d): %d @%d\n", xColumn, yRow, on, vel);
+        c->gridPadOn(xColumn, yRow, on ? 36 : 50);
+    };
     
     CFRunLoopRun();
     return 0;

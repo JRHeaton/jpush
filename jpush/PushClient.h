@@ -16,11 +16,21 @@
 
 class PushClient : public MIDIClient {
 protected:
-    MIDIEndpointRef userPortDest, userPortSrc;
-    
-    void    handleMIDIIn(const MIDIPacketList *list);
+    void            handleMsg(UInt8 *buf, size_t len);
+    MIDIEndpointRef userPortSrc;
     
 public:
+    PushClient(CFStringRef name=CFSTR("PushClient"));
+    ~PushClient();
+    
+    MIDIEndpointRef userPortDest, livePortDest;
+    MIDIEndpointRef destEndpoint = 0;
+    
+    void            (^gridPadHandler)(UInt8 xColumn,
+                                      UInt8 yRow,
+                                      UInt8 velocity,
+                                      bool on) = 0;
+    
     static const UInt8 kLCDColumnWidth;
     static const UInt8 kPushSysexPrefix[4];
     static const UInt8 kPushSysexSetModeCmd[3];
@@ -29,12 +39,7 @@ public:
     
     static std::map<std::string, UInt8> *ButtonTitleCCMap;
     
-    PushClient(CFStringRef name=CFSTR("PushClient"));
-    ~PushClient();
-    
-    void            (^rawInputHandler)(UInt8 *buf, size_t len) = 0;
-    void            (^gridPadHandler)(UInt8 xColumn, UInt8 yRow, bool on) = 0;
-    void            (^sysexHandler)(UInt8 *buf, size_t len) = 0;
+    void            (^modeChangeHandler)(bool userMode)                     = 0;
     
     static UInt8    keyForGridPosition(UInt8 column, UInt8 row);
     static void     gridPositionForKey(UInt8 key, UInt8 *column, UInt8 *row);
@@ -49,7 +54,8 @@ public:
     PushClient  *setUserMode(bool userMode=true, bool autoHighlightUserButton=false);
     PushClient  *clearAll();
     
-    PushClient  *clearGrid();
+    PushClient  *allGridPads(UInt8 velocity=VELOCITY_MAX);
+    PushClient  *clearGrid() { return allGridPads(0); };
     PushClient  *gridPadOn(UInt8 xColumn, UInt8 yRow, UInt8 velocity=VELOCITY_MAX);
     PushClient  *gridPadOff(UInt8 xColumn, UInt8 yRow) { return gridPadOn(xColumn, yRow, 0); };
     
@@ -62,7 +68,7 @@ public:
     PushClient  *clearLCD(SInt8 line=-1);
     PushClient  *writeLCD(std::string text, SInt8 line=0, UInt8 charInset=0);
     
-    virtual std::string logString();
+    virtual     std::string logString();
 };
 
 #endif /* PUSHCLIENT_H */

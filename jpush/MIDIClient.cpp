@@ -49,12 +49,14 @@ void MIDIClient::MIDINotifyProc(const MIDINotification *message, void *refCon) {
 }
 
 void MIDIClient::MIDIReadProc(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon) {
-    ((MIDIClient *)readProcRefCon)->handleMIDIIn(pktlist);
+    ((MIDIClient *)readProcRefCon)->handlePacketList(pktlist);
 }
 
-void MIDIClient::handleMIDIIn(const MIDIPacketList *list) {
+void MIDIClient::handleMsg(UInt8 *buf, size_t len) {
+    MIDIMsgHandler::handleMsg(buf, len);
+    
     if(debuggingEnabled)
-        logData("midiIn", (UInt8 *)list->packet[0].data, list->packet[0].length);
+        logData("midiIn", buf, len);
 }
 
 MIDIClient::MIDIClient(CFStringRef name, bool verbose) {

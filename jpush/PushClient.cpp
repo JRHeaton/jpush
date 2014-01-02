@@ -77,8 +77,8 @@ PushClient::PushClient(CFStringRef name) : MIDIClient(name) {
         b("user",           0x3B);
         b("mute",           0x3C);
         b("solo",           0x3D);
-        b("drilldown",      0x3E);
-        b("back",           0x3F);
+        b("in",             0x3E);
+        b("out",            0x3F);
         b("play",           0x55);
         b("record",         0x56);
         b("new",            0x57);
@@ -114,35 +114,17 @@ PushClient::PushClient(CFStringRef name) : MIDIClient(name) {
         CFRelease(n);
     }
     
+    customHandlerStatusBytes[0x90] = true;
+    customHandlerStatusBytes[0x80] = true;
+    
+    livePortDest = getDestination(CFSTR("Live Port"));
+    destEndpoint = userPortDest;
     connectSource(userPortSrc);
 }
 
 PushClient::~PushClient() {
     MIDIPortDisconnectSource(inPort, userPortDest);
     MIDIClient::~MIDIClient();
-}
-
-void PushClient::handleMIDIIn(const MIDIPacketList *packetList) {
-    MIDIClient::handleMIDIIn(packetList);
-    
-    const MIDIPacket *packet = &packetList->packet[0];
-    for (int i = 0; i < packetList->numPackets; ++i) {
-        
-        UInt8 status = packet->data[0];
-        
-        if(rawInputHandler)
-            rawInputHandler((UInt8 *)packet->data, packet->length);
-        
-        if((status | 0x90) == 0x90 && gridPadHandler) {
-            UInt8 x, y;
-            PushClient::gridPositionForKey(packet->data[1], &x, &y);
-            gridPadHandler(x, y, packet->data[2] != 0);
-        } else if(status == 0xf0 && sysexHandler) {
-            sysexHandler((UInt8 *)packet->data, packet->length);
-        }
-        
-        packet = MIDIPacketNext(packet);
-    }
 }
 
 UInt8 PushClient::keyForGridPosition(UInt8 column, UInt8 row) {
@@ -166,7 +148,7 @@ PushClient *PushClient::setUserMode(bool userMode, bool autoHighlightUserButton)
     b[3] = userMode == true;
     sendSysex(b, 4);
     
-    if(autoHighlightUserButton)
+    if(userMode && autoHighlightUserButton)
         buttonOn("user");
     
     return this;
@@ -200,7 +182,7 @@ PushClient *PushClient::sendSysex(UInt8 *buf,
         memcpy(&gbuf[4], buf, len);
     }
     
-    MIDIClient::sendSysex(userPortDest, gbuf, llen, completionProc, applyTerminatingByte);
+    MIDIClient::sendSysex(destEndpoint, gbuf, llen, completionProc, applyTerminatingByte);
     free(gbuf);
     
     return this;
@@ -213,12 +195,12 @@ PushClient *PushClient::gridPadOn(UInt8 xColumn, UInt8 yRow, UInt8 velocity) {
     return sendMIDI(buf, 3);
 }
 
-PushClient *PushClient::clearGrid() {
+PushClient *PushClient::allGridPads(UInt8 velocity) {
     bool pre = debuggingEnabled;
     debuggingEnabled = false;
     for (int i=0;i<8;++i) {
         for(int x=0;x<8;++x) {
-            gridPadOff(i, x);
+            gridPadOn(i, x, velocity);
         }
     }
     debuggingEnabled = pre;
@@ -311,4 +293,22 @@ PushClient *PushClient::clearButtons() {
     allButtons(0);
     
     return this;
+}
+
+void PushClient::handleMsg(UInt8 *buf, size_t len) {
+    MIDIClient::handleMsg(buf, len);
+    
+    if((buf[0] & 0xf0) == 0x90) {
+        if(gridPadHandler) {
+            UInt8 c, r;
+            PushClient::gridPositionForKey(buf[1], &c, &r);
+            gridPadHandler(c, r, buf[2], true);
+        }
+    } else if((buf[0] & 0xf0) == 0x80) {
+        if(gridPadHandler) {
+            UInt8 c, r;
+            PushClient::gridPositionForKey(buf[1], &c, &r);
+            gridPadHandler(c, r, buf[2], false);
+        }
+    }
 }
